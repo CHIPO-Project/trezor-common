@@ -1,13 +1,13 @@
 #!/usr/bin/env python3
 import fnmatch
-import glob
 import io
 import json
 import logging
-import os
 import re
-import struct
 import sys
+import os
+import glob
+import struct
 import zlib
 from collections import defaultdict
 from hashlib import sha256
@@ -145,13 +145,6 @@ def render_file(src, dst, coins, support_info):
 # ====== validation functions ======
 
 
-def mark_unsupported(support_info, coins):
-    for coin in coins:
-        key = coin["key"]
-        # checking for explicit False because None means unknown
-        coin["unsupported"] = all(v is False for v in support_info[key].values())
-
-
 def highlight_key(coin, color):
     """Return a colorful string where the SYMBOL part is bold."""
     keylist = coin["key"].split(":")
@@ -184,9 +177,9 @@ def check_eth(coins):
         print_log(logging.ERROR, chain_name_str, bucket_str)
         check_passed = False
     for coin in coins:
-        icon_file = coin["shortcut"].lower() + ".png"
+        icon_file = "defs/ethereum/%s.png" % coin["shortcut"].lower()
         try:
-            icon = Image.open(os.path.join(coin_info.DEFS_DIR, "ethereum", icon_file))
+            icon = Image.open(icon_file)
         except Exception:
             print(coin["key"], ": failed to open icon file", icon_file)
             check_passed = False
@@ -200,6 +193,7 @@ def check_eth(coins):
 
 def check_btc(coins):
     check_passed = True
+    support_infos = coin_info.support_info(coins)
 
     # validate individual coin data
     for coin in coins:
@@ -215,11 +209,11 @@ def check_btc(coins):
         for coin in bucket:
             name = coin["name"]
             prefix = ""
-            if name.endswith("Testnet") or name.endswith("Regtest"):
+            if name.endswith("Testnet"):
                 color = "green"
             elif name == "Bitcoin":
                 color = "red"
-            elif coin["unsupported"]:
+            elif coin.get("unsupported"):
                 color = "grey"
                 prefix = crayon("blue", "(X)", bold=True)
             else:
@@ -238,16 +232,17 @@ def check_btc(coins):
         """
         failed = False
         for key, bucket in buckets.items():
-            mainnets = [
-                c
-                for c in bucket
-                if not c["name"].endswith("Testnet")
-                and not c["name"].endswith("Regtest")
-            ]
+            mainnets = [c for c in bucket if not c["name"].endswith("Testnet")]
 
-            have_bitcoin = any(coin["name"] == "Bitcoin" for coin in mainnets)
-            supported_mainnets = [c for c in mainnets if not c["unsupported"]]
-            supported_networks = [c for c in bucket if not c["unsupported"]]
+            have_bitcoin = False
+            for coin in mainnets:
+                if coin["name"] == "Bitcoin":
+                    have_bitcoin = True
+                if all(v is False for k, v in support_infos[coin["key"]].items()):
+                    coin["unsupported"] = True
+
+            supported_mainnets = [c for c in mainnets if not c.get("unsupported")]
+            supported_networks = [c for c in bucket if not c.get("unsupported")]
 
             if len(mainnets) > 1:
                 if (have_bitcoin or strict) and len(supported_networks) > 1:
@@ -290,7 +285,7 @@ def check_btc(coins):
     return check_passed
 
 
-def check_dups(buckets, print_at_level=logging.WARNING):
+def check_dups(buckets, print_at_level=logging.ERROR):
     """Analyze and pretty-print results of `coin_info.mark_duplicate_shortcuts`.
 
     `print_at_level` can be one of logging levels.
@@ -305,19 +300,15 @@ def check_dups(buckets, print_at_level=logging.WARNING):
         """Colorize coins. Tokens are cyan, nontokens are red. Coins that are NOT
         marked duplicate get a green asterisk.
         """
-        prefix = ""
-        if coin["unsupported"]:
-            color = "grey"
-            prefix = crayon("blue", "(X)", bold=True)
-        elif coin_info.is_token(coin):
+        if coin_info.is_token(coin):
             color = "cyan"
         else:
             color = "red"
-
-        if not coin.get("duplicate"):
-            prefix = crayon("green", "*", bold=True) + prefix
-
         highlighted = highlight_key(coin, color)
+        if not coin.get("duplicate"):
+            prefix = crayon("green", "*", bold=True)
+        else:
+            prefix = ""
         return "{}{}".format(prefix, highlighted)
 
     check_passed = True
@@ -327,29 +318,17 @@ def check_dups(buckets, print_at_level=logging.WARNING):
         if not bucket:
             continue
 
-        supported = [coin for coin in bucket if not coin["unsupported"]]
         nontokens = [coin for coin in bucket if not coin_info.is_token(coin)]
-        cleared = not any(coin.get("duplicate") for coin in bucket)
 
         # string generation
         dup_str = ", ".join(coin_str(coin) for coin in bucket)
-        if len(nontokens) > 1:
-            # Two or more colliding nontokens. This is always fatal.
-            # XXX consider allowing two nontokens as long as only one is supported?
+        if not nontokens:
+            level = logging.DEBUG
+        elif len(nontokens) == 1:
+            level = logging.INFO
+        else:
             level = logging.ERROR
             check_passed = False
-        elif len(supported) > 1:
-            # more than one supported coin in bucket
-            if cleared:
-                # some previous step has explicitly marked them as non-duplicate
-                level = logging.INFO
-            else:
-                # at most 1 non-token - we tenatively allow token collisions
-                # when explicitly marked as supported
-                level = logging.WARNING
-        else:
-            # At most 1 supported coin, at most 1 non-token. This is informational only.
-            level = logging.DEBUG
 
         # deciding whether to print
         if level < print_at_level:
@@ -358,7 +337,7 @@ def check_dups(buckets, print_at_level=logging.WARNING):
         if symbol == "_override":
             print_log(level, "force-set duplicates:", dup_str)
         else:
-            print_log(level, "duplicate symbol {}:".format(symbol.upper()), dup_str)
+            print_log(level, "duplicate symbol {}:".format(symbol), dup_str)
 
     return check_passed
 
@@ -545,7 +524,8 @@ def cli(colors):
 # fmt: off
 @click.option("--backend/--no-backend", "-b", default=False, help="Check blockbook/bitcore responses")
 @click.option("--icons/--no-icons", default=True, help="Check icon files")
-@click.option("-d", "--show-duplicates", type=click.Choice(("all", "nontoken", "errors")), default="errors", help="How much information about duplicate shortcuts should be shown.")
+@click.option("-d", "--show-duplicates", type=click.Choice(("all", "nontoken", "errors")),
+    default="errors", help="How much information about duplicate shortcuts should be shown.")
 # fmt: on
 def check(backend, icons, show_duplicates):
     """Validate coin definitions.
@@ -587,8 +567,6 @@ def check(backend, icons, show_duplicates):
         raise click.ClickException("Missing requirements for icon check")
 
     defs, buckets = coin_info.coin_info_with_duplicates()
-    support_info = coin_info.support_info(defs)
-    mark_unsupported(support_info, defs.as_list())
     all_checks_passed = True
 
     print("Checking BTC-like coins...")
@@ -604,7 +582,7 @@ def check(backend, icons, show_duplicates):
     elif show_duplicates == "nontoken":
         dup_level = logging.INFO
     else:
-        dup_level = logging.WARNING
+        dup_level = logging.ERROR
     print("Checking unexpected duplicates...")
     if not check_dups(buckets, dup_level):
         all_checks_passed = False
@@ -801,9 +779,8 @@ def coindefs(outfile):
 @click.argument("paths", metavar="[path]...", nargs=-1)
 @click.option("-o", "--outfile", type=click.File("w"), help="Alternate output file")
 @click.option("-v", "--verbose", is_flag=True, help="Print rendered file names")
-@click.option("-b", "--bitcoin-only", is_flag=True, help="Accept only Bitcoin coins")
 # fmt: on
-def render(paths, outfile, verbose, bitcoin_only):
+def render(paths, outfile, verbose):
     """Generate source code from Mako templates.
 
     For every "foo.bar.mako" filename passed, runs the template and
@@ -823,13 +800,6 @@ def render(paths, outfile, verbose, bitcoin_only):
     # prepare defs
     defs = coin_info.coin_info()
     support_info = coin_info.support_info(defs)
-
-    if bitcoin_only:
-        defs["bitcoin"] = [
-            x
-            for x in defs["bitcoin"]
-            if x["coin_name"] in ("Bitcoin", "Testnet", "Regtest")
-        ]
 
     # munch dicts - make them attribute-accessible
     for key, value in defs.items():

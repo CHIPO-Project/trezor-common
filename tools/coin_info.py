@@ -1,10 +1,10 @@
 #!/usr/bin/env python3
-import glob
-import json
-import logging
-import os
+from collections import defaultdict, OrderedDict
 import re
-from collections import OrderedDict, defaultdict
+import os
+import json
+import glob
+import logging
 
 try:
     import requests
@@ -304,19 +304,17 @@ def support_info_single(support_data, coin):
     key = coin["key"]
     dup = coin.get("duplicate")
     for device, values in support_data.items():
-        if key in values["unsupported"]:
+        if dup and is_token(coin):
+            support_value = False
+        elif key in values["unsupported"]:
             support_value = False
         elif key in values["supported"]:
             support_value = values["supported"][key]
         elif device in MISSING_SUPPORT_MEANS_NO:
             support_value = False
         elif is_token(coin):
-            if dup:
-                # if duplicate token that is not explicitly listed, it's unsupported
-                support_value = False
-            else:
-                # otherwise implicitly supported in next
-                support_value = "soon"
+            # tokens are implicitly supported in next release
+            support_value = "soon"
         else:
             support_value = None
         support_info[device] = support_value
@@ -411,7 +409,7 @@ def deduplicate_erc20(buckets, networks):
     This function works on results of `mark_duplicate_shortcuts`.
 
     Buckets that contain at least one non-token are ignored - symbol collisions
-    with non-tokens always apply.
+    with non-tokens are always fatal.
 
     Otherwise the following rules are applied:
 
@@ -491,7 +489,7 @@ def deduplicate_keys(all_coins):
 
 
 def _btc_sort_key(coin):
-    if coin["name"] in ("Bitcoin", "Testnet", "Regtest"):
+    if coin["name"] in ("Bitcoin", "Testnet"):
         return "000000" + coin["name"]
     else:
         return coin["name"]
@@ -504,6 +502,8 @@ def collect_coin_info():
     `erc20` for ERC20 tokens,
     `nem` for NEM mosaics,
     `misc` for other networks.
+
+    Automatically removes duplicate symbols from the result.
     """
     all_coins = CoinsInfo(
         bitcoin=_load_btc_coins(),
@@ -548,14 +548,13 @@ def coin_info_with_duplicates():
 
 
 def coin_info():
-    """Collects coin info, fills out support info and returns the result.
-
-    Does not auto-delete duplicates. This should now be based on support info.
+    """Collects coin info, marks and prunes duplicate ERC20 symbols, fills out support
+    info and returns the result.
     """
     all_coins, _ = coin_info_with_duplicates()
-    # all_coins["erc20"] = [
-    #     coin for coin in all_coins["erc20"] if not coin.get("duplicate")
-    # ]
+    all_coins["erc20"] = [
+        coin for coin in all_coins["erc20"] if not coin.get("duplicate")
+    ]
     return all_coins
 
 

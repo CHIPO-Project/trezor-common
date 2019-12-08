@@ -81,7 +81,6 @@ message MoneroGetAddress {
     optional uint32 network_type = 3;       // Main-net / testnet / stagenet
     optional uint32 account = 4;            // Major subaddr index
     optional uint32 minor = 5;              // Minor subaddr index
-    optional bytes payment_id = 6;          // Payment ID for integrated address
 }
 
 /**
@@ -139,8 +138,6 @@ message MoneroTransactionInitRequest {
         optional MoneroTransactionRsigData rsig_data = 11;
         repeated uint32 integrated_indices = 12;
         optional uint32 client_version = 13;  // connected client version
-        optional uint32 hard_fork = 14;       // transaction hard fork number
-        optional bytes monero_version = 15;   // monero software version
     }
 }
 
@@ -195,7 +192,7 @@ message MoneroTransactionInputsPermutationAck {
  * @next MoneroTransactionInputViniAck
  */
 message MoneroTransactionInputViniRequest {
-    optional MoneroTransactionSourceEntry src_entr = 1;
+    optional MoneroTransactionSourceEntry src_entr = 1; 
     optional bytes vini = 2;      // xmrtypes.TxinToKey
     optional bytes vini_hmac = 3;
     optional bytes pseudo_out = 4;

@@ -2,12 +2,12 @@
   "coin_name": "Crown",
   "coin_shortcut": "CRW",
   "coin_label": "Crown",
-  "website": "https://crownplatform.com",
+  "website": "https://crown.tech",
   "github": "https://github.com/Crowndev/crowncoin",
-  "maintainer": "Ashot <ashot@crownplatform.com>",
+  "maintainer": "hypermist <hypermist@crown.tech>",
   "curve_name": "secp256k1",
-  "address_type": 95495,
-  "address_type_p2sh": 95473,
+  "address_type": 0,
+  "address_type_p2sh": 28,
   "maxfee_kb": 2000000,
   "minfee_kb": 1000,
   "signed_message_header": "Crown Signed Message:\n",
@@ -30,16 +30,10 @@
   "dust_limit": 546,
   "blocktime_seconds": 60,
   "uri_prefix": "crown",
-  "min_address_length": 36,
-  "max_address_length": 40,
-  "bitcore": [
-    "https://insight-01.crownplatform.com",
-    "https://insight-02.crownplatform.com",
-    "https://insight-03.crownplatform.com"
-  ],
+  "min_address_length": 27,
+  "max_address_length": 34,
+  "bitcore": [],
   "blockbook": [],
-  "negative_fee": false,
   "cooldown": 100,
-  "consensus_branch_id": null,
-  "confidential_assets": null
+  "consensus_branch_id": null
 }

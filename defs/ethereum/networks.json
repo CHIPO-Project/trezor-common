@@ -42,17 +42,7 @@
     "shortcut": "tRIN",
     "name": "Ethereum Testnet Rinkeby",
     "rskip60": false,
-    "url": "https://rinkeby.io",
-    "blockbook": []
-  },
-  {
-    "chain": "gor",
-    "chain_id": 5,
-    "slip44": 1,
-    "shortcut": "tGOR",
-    "name": "Ethereum Testnet Goerli",
-    "rskip60": false,
-    "url": "https://www.goerli.net",
+    "url": "https://www.ethereum.org",
     "blockbook": []
   },
   {
@@ -63,16 +53,6 @@
     "name": "Ubiq",
     "rskip60": false,
     "url": "https://ubiqsmart.com",
-    "blockbook": []
-  },
-  {
-    "chain": "meta",
-    "chain_id": 11,
-    "slip44": 916,
-    "shortcut": "META",
-    "name": "Metadium",
-    "rskip60": false,
-    "url": "https://metadium.com",
     "blockbook": []
   },
   {
@@ -126,6 +106,16 @@
     "blockbook": []
   },
   {
+    "chain": "eti",
+    "chain_id": 101,
+    "slip44": 464,
+    "shortcut": "ETI",
+    "name": "EtherInc",
+    "rskip60": false,
+    "url": "https://einc.io",
+    "blockbook": []
+  },
+  {
     "chain": "etc",
     "chain_id": 61,
     "slip44": 61,
@@ -169,26 +159,6 @@
     "blockbook": []
   },
   {
-    "chain": "eti",
-    "chain_id": 101,
-    "slip44": 464,
-    "shortcut": "ETI",
-    "name": "EtherInc",
-    "rskip60": false,
-    "url": "https://einc.io",
-    "blockbook": []
-  },
-  {
-    "chain": "ask",
-    "chain_id": 222,
-    "slip44": 2221,
-    "shortcut": "ASK",
-    "name": "Permission",
-    "rskip60": false,
-    "url": "https://permission.io",
-    "blockbook": []
-  },
-  {
     "chain": "dxn",
     "chain_id": 237,
     "slip44": 237,
@@ -196,16 +166,6 @@
     "name": "DEXON",
     "rskip60": false,
     "url": "https://dexon.org",
-    "blockbook": []
-  },
-  {
-    "chain": "hpb",
-    "chain_id": 269,
-    "slip44": 269,
-    "shortcut": "HPB",
-    "name": "High Performance Blockchain",
-    "rskip60": false,
-    "url": "https://hpb.io",
     "blockbook": []
   },
   {
@@ -229,16 +189,6 @@
     "blockbook": []
   },
   {
-    "chain": "egem",
-    "chain_id": 1987,
-    "slip44": 1987,
-    "shortcut": "EGEM",
-    "name": "EtherGem",
-    "rskip60": false,
-    "url": "https://egem.io",
-    "blockbook": []
-  },
-  {
     "chain": "eosc",
     "chain_id": 2018,
     "slip44": 2018,
@@ -246,6 +196,16 @@
     "name": "EOS Classic",
     "rskip60": false,
     "url": "https://eos-classic.io",
+    "blockbook": []
+  },
+  {
+    "chain": "egem",
+    "chain_id": 1987,
+    "slip44": 1987,
+    "shortcut": "EGEM",
+    "name": "EtherGem",
+    "rskip60": false,
+    "url": "https://egem.io",
     "blockbook": []
   },
   {
@@ -266,16 +226,6 @@
     "name": "Ethersocial Network",
     "rskip60": false,
     "url": "https://ethersocial.org",
-    "blockbook": []
-  },
-  {
-    "chain": "teo",
-    "chain_id": 33416,
-    "slip44": 33416,
-    "shortcut": "TEO",
-    "name": "Trust ETH reOrigin",
-    "rskip60": false,
-    "url": "https://tao.foundation",
     "blockbook": []
   },
   {
@@ -309,16 +259,6 @@
     "blockbook": []
   },
   {
-    "chain": "etho",
-    "chain_id": 1313114,
-    "slip44": 1313114,
-    "shortcut": "ETHO",
-    "name": "Ether-1",
-    "rskip60": false,
-    "url": "https://ether1.org",
-    "blockbook": []
-  },
-  {
     "chain": "music",
     "chain_id": 7762959,
     "slip44": 184,
@@ -329,23 +269,13 @@
     "blockbook": []
   },
   {
-    "chain": "aux",
-    "chain_id": 28945486,
-    "slip44": 344,
-    "shortcut": "AUX",
-    "name": "Auxilium",
+    "chain": "etho",
+    "chain_id": 1313114,
+    "slip44": 1313114,
+    "shortcut": "ETHO",
+    "name": "Ether-1",
     "rskip60": false,
-    "url": "https://auxilium.global",
-    "blockbook": []
-  },
-  {
-    "chain": "aqua",
-    "chain_id": 61717561,
-    "slip44": 61717561,
-    "shortcut": "AQUA",
-    "name": "Aquachain",
-    "rskip60": false,
-    "url": "https://aquachain.github.io",
+    "url": "https://ether1.org",
     "blockbook": []
   },
   {

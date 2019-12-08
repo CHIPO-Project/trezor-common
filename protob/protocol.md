@@ -1,4 +1,4 @@
-# Trezor Protocol
+# TREZOR Protocol
 
 ## version 1
 
