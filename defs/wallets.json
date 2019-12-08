@@ -93,6 +93,9 @@
     "bitcoin:PART": {
         "Particl Core": "https://github.com/particl/particl-core/releases"
     },
+    "bitcoin:CHIPO": {
+        "Electrum-CHIPO": "https://github.com/CHIPO-Project/electrum-chipo"
+    },
     "bitcoin:PIVX": {
         "SPMT": "https://github.com/PIVX-Project/PIVX-SPMT/",
         "Zephyr": "https://github.com/mrcarlanthony/Zephyr-wallet"
