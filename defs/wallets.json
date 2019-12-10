@@ -93,7 +93,7 @@
     "bitcoin:PART": {
         "Particl Core": "https://github.com/particl/particl-core/releases"
     },
-    "bitcoin:CHIPO": {
+    "bitcoin:ICU": {
         "Electrum-CHIPO": "https://github.com/CHIPO-Project/electrum-chipo"
     },
     "bitcoin:PIVX": {

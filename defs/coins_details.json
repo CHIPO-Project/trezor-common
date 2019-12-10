@@ -522,7 +522,7 @@
                 }
             ]
         },
-        "bitcoin:CHIPO": {
+        "bitcoin:ICU": {
             "links": {
                 "Github": "https://github.com/CHIPO-Project/CHIPO",
                 "Homepage": "https://www.chipo.icu/"
